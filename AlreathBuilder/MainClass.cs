@@ -12,10 +12,14 @@ namespace AlreathBuilder
     
     class AlreathBuilder
     {
+        //Uses different methods due to different structs for the edits so each method sets up the correct type instead of more work in single method
+        //Each struct should be serializable and should be the same format that Alreath is expecting to convert it correctly
+
+        //Structs might switch out for classes, it depends how I get them to setup and what I need them for
         
         [Serializable]
         public struct Job {
-            // switch to a private and methods to set values?  
+            // switch to private vals with a class and use methods to set values?  
             // or leave public to allow tweaks
             public string name;
             private string desc;
@@ -29,8 +33,12 @@ namespace AlreathBuilder
             // lvl 5 mage has +25 Int and +25 WIS,
             // lvl 1 Wizard had +10 INT and + 10 WIS
 
-            //This require dictionary may not just apply to jobs so extra info is applied to description
-            //Jobs would normally check only prev joblvls, quests and rarely flags
+            //  [("WIS", 6)("CON",4)("LCK",7)]
+
+
+            //Jobs would normally check only prev joblvls, quests and rarely flags to determine if able to switch jobs
+
+            //I will figure out what method to translate the data to determine what is required and how to check those values
 
             // Dictionary of the requirements to use this class, name: req
             // req is a string allows for certain flags to be checked as well
@@ -42,14 +50,18 @@ namespace AlreathBuilder
             //list of requirements need to pass to use job
             // equip of require fail will keep old job
             // string contains multiple parts to strip, 
-            // underscore is delimiter
-            // title_equip_Mastery of Mage
-            // job_unlock_
+            // underscore and slash are delimiters, might switch to only use one or another way to split them up
+
+            //Requires mastery of mage to be equipped and to have Hunter unlocked, why this combination who knows
+            //  ["title/equip_Mastery of Mage","job/unlock_hunter"]
 
             public Dictionary<string, int> unlockList;
 
             // string is the name of the thing unlocked, this string references what type is unlocked similar to require,
             // the string is passed of and the correct thing is unlocked, these are all saved on the server to pull from
+            // This reward system is handled ingame against player and server storage
+
+            //int is the lvl required for the unlock, which is rewarded at that lvl
             //ex title/mageMastery, 100 
 
             //private ??? unlock
@@ -75,7 +87,7 @@ namespace AlreathBuilder
             {
 
                 Console.WriteLine("----Job Builder----");
-                Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
+                Console.WriteLine("Choose New Job (N), Edit (E), List (L), Delete Old (DEL), Help (?), Quit (Q)");
                 string input = Console.ReadLine();
                 switch (input.ToUpper())
                 {
@@ -90,9 +102,13 @@ namespace AlreathBuilder
                         string jobName = input;
                         //Set values for job
                         job.name = input;
-                        
 
-
+                        Console.WriteLine("Stat Block:");
+                        input = Console.ReadLine().ToLower();
+                        //job.statBlock = ;
+                        Console.WriteLine("UnlockList:");
+                        input = Console.ReadLine().ToLower();
+                        //job.unlockList = ;
 
 
                         string filePath = filepath + "\\" + jobName + ".jb";
@@ -106,10 +122,38 @@ namespace AlreathBuilder
                     case ("EDIT"):
 
                         Console.WriteLine("Input Name of Job to Edit");
-                        //
+                        //Find which file to edit
                         input = Console.ReadLine().ToLower();
 
                         //TODO
+
+                        var editList = Directory.GetFiles(filepath, "*.jb");
+                        foreach (var file in editList)
+                        {
+                            //This way we can reference new and old files at the same time by string concat or file
+                            if (filepath + "\\" + input + ".jb" == file)
+                            {
+                                Console.WriteLine("Editing " + input);
+
+                                //Now to figure out what to edit by asking questions again, showing what the old val was
+                                // Edit ~ to use existing values
+                                // Maybe have a mode to append values like data so things can just be added and not replaced
+                                // ~+ to add or extend to existing, ~- to remove or subtract component
+                                //This way the things can be loaded in a tweaked without breaking older edits from scratch
+
+                                //Console.WriteLine("StatBlock: ");
+                                //Console.WriteLine(file.statblock);
+                                //input = Console.ReadLine();
+                                //if (input != "~" || input != "~+" || input != "~-"){ replace vals } else {  merge new and old   }
+
+
+                                break;
+                            }
+                        }
+                        //Didnt find file in dir or finished
+                        //Console.WriteLine("File not found in Cur Dir");
+                        //ENDTODO
+
 
                         break;
                     case ("L"):
@@ -139,12 +183,17 @@ namespace AlreathBuilder
                             }
                         }
                         break;
+                    case ("?"):
+                    case ("HELP"):
+                        Console.WriteLine("This is the Help Txt");
+                        Console.WriteLine("This will be filled with help once systems are in place");
+                        break;
                     case ("Q"):
                     case ("QUIT"):
                         loop = false;
                         break;
                     default:
-                        Console.WriteLine("Incorrect Input");
+                        Console.WriteLine("Incorrect Input, Try ?");
                         break;
                 }
             }
@@ -164,7 +213,7 @@ namespace AlreathBuilder
             {
 
                 Console.WriteLine("----Item Builder----");
-                Console.WriteLine("Choose New (N), Edit (E), List (L), Delete (DEL), Quit (Q)");
+                Console.WriteLine("Choose New (N), Edit (E), List (L), Delete (DEL), Help (?), Quit (Q)");
                 string input = Console.ReadLine();
                 switch (input.ToUpper())
                 {
@@ -213,7 +262,7 @@ namespace AlreathBuilder
                         break;
                     case ("L"):
                     case ("LIST"):
-                        //Will Get list of all Items in DIR\Jobs
+                        //Will Get list of all Items in DIR\Items
                         var listFiles = Directory.GetFiles(filepath, "*.item");
                         foreach (var file in listFiles)
                         {
@@ -235,6 +284,11 @@ namespace AlreathBuilder
                                 File.Delete(filepath + "\\" + file);
                             }
                         }
+                        break;
+                    case ("?"):
+                    case ("HELP"):
+                        Console.WriteLine("This is the Help Txt");
+                        Console.WriteLine("This will be filled with help once systems are in place");
                         break;
                     case ("Q"):
                     case ("QUIT"):
@@ -260,7 +314,7 @@ namespace AlreathBuilder
         {
 
             Console.WriteLine("----Monster Builder----");
-            Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
+            Console.WriteLine("Choose New Monster (N), Edit (E), List (L), Delete Old (DEL), Help (?), Quit (Q)");
             string input = Console.ReadLine();
             switch (input.ToUpper())
             {
@@ -292,7 +346,7 @@ namespace AlreathBuilder
                     break;
                 case ("L"):
                 case ("LIST"):
-                        //Will Get list of all Items in DIR\Jobs
+                        //Will Get list of all Items in DIR\Monsters
                         var listFiles = Directory.GetFiles(filepath, "*.mob");
                         foreach (var file in listFiles)
                         {
@@ -300,10 +354,11 @@ namespace AlreathBuilder
                         }
                         break;
                 case ("DEL"):
+                case ("DELETE"):
                     //
                     Console.WriteLine("Input Name of Monster to Delete");
                     input = Console.ReadLine();
-                    //Checks in DIR\Items for the inputed name
+                    //Checks in DIR\Monsters for the inputed name
                     var delList = Directory.GetFiles(filepath, "*.mob");
                     foreach (var file in delList)
                     {
@@ -314,7 +369,13 @@ namespace AlreathBuilder
                         }
                     }
                     break;
-                case ("Q"):
+                    case ("?"):
+                    case ("HELP"):
+                        Console.WriteLine("This is the Help Txt");
+                        Console.WriteLine("This will be filled with help once systems are in place");
+                        break;
+                    case ("Q"):
+                    case ("QUIT"):
                     loop = false;
                     break;
                 default:
@@ -331,6 +392,9 @@ namespace AlreathBuilder
 
             Console.WriteLine("Server Storage Dir: ");
             string curDir = Console.ReadLine();
+
+            //Enter just sticks it in C drive for now, not where exe is.
+
 
             //Start loop
             bool loop = true;
@@ -359,6 +423,7 @@ namespace AlreathBuilder
                         MonsterBuilder(curDir + "\\Monsters");
                         break;
                     case "CD":
+                        Console.WriteLine("Cur Dir: " + curDir);
                         Console.WriteLine("New Storage Dir:");
                         curDir = Console.ReadLine();
                         break;
