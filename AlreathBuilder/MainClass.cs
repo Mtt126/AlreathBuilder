@@ -73,14 +73,47 @@ namespace AlreathBuilder
 
 
         }
+        [Serializable]
         public struct Monster { }
-
+        [Serializable]
         public struct Item{ }
+        [Serializable]
+        public struct Reward {
+            public string rewardName;
+            public string rewardType;
+            public string rewardData;
+        }
+        [Serializable]
+        public struct Objective {
+            // Objective Condition
+            // Hidden
+            // Last
+        }
+        [Serializable]
+        public struct QstStage {
+            public List<Objective> ObjList;
+
+
+        }
+        [Serializable]
+        public struct Quest {
+            public string QID; // Quest Name
+            public bool hidden; // Quest Hidden
+            public int limit;  // Limit time till failure
+            public bool spec;  // Special
+            public int repeat; // Amount of times can repeat
+            public int curStage;//this is the stage that is checked for conditions, starts with the first in list and moves thro
+            public string desc; // Desc of the quest for checking what it is
+            public List<QstStage> StageList; // 
+            public List<Reward> QstRwds; // List of rewards once quest is finished
+
+        }
 
         private static void JobBuilder(string filepath, string command = "")
         {
             //JobBuilder
             //  --Stat Block
+            //      -Breaks apart 
             //  --Requirements
             //  --Lvl Unlocks
             //      --Skills
@@ -89,7 +122,6 @@ namespace AlreathBuilder
             bool loop = true;
             while (loop)
             {
-
                 Console.WriteLine("----Job Builder----");
                 Console.WriteLine("Choose New Job (N), Edit (E), List (L), Delete Old (DEL), Help (?), Quit (Q)");
                 string input = Console.ReadLine();
@@ -104,7 +136,7 @@ namespace AlreathBuilder
                         Job job = new Job
                         {
                             //Set default values for job on init, name can be input as this was just entered
-                            // I could setup defaults here to be overridden so the memory is atleast filled untill replaced
+                            // I could setup defaults here to be overridden so the memory is atleast filled until replaced
                             name = input, desc = "Un-Init Desc", exp = 0, lvl = 0, statBlock = { }, requireList = { }, unlockList = { }
                         };
 
@@ -118,11 +150,13 @@ namespace AlreathBuilder
                         string[] inputstats = input.Split(' ');
                         int statcount = inputstats.Length;
                         Dictionary<string, int> stats = new Dictionary<string, int>();
-                        // Split produces 1 as default, so need to check if blank
+                        // Split produces 1? as default, so need to check if blank
+                        Console.WriteLine(statcount);
                         if (statcount != 1 && inputstats[0]!="") {
-                            //Console.WriteLine(statcount);
+                            
                             foreach (string stat in inputstats) {
                                 string st = stat.Split(',')[0];
+                                //might need to verify input vars to help parse
                                 int val = int.Parse(stat.Split(',')[1]);
                                 Console.WriteLine(st);
                                 stats.Add(st, val);
@@ -145,9 +179,8 @@ namespace AlreathBuilder
                         {
                             //Just copy the array to list for now, might switch to a struct system with flags instead and use a system as the others
 
-
                             reqs = requireLst.ToList();
-
+                            // or below with mods to run with it
                             //foreach (string req in requireLst)
                             //{
                             //    reqs.Add(req);
@@ -157,7 +190,7 @@ namespace AlreathBuilder
 
                         Console.WriteLine("UnlockList:");
                         Console.WriteLine("EX: Skill/Fireball,1 Job/Warden,15 Title/Mastery,100 ");
-                        Console.WriteLine("Comma for split items, / for typing");
+                        Console.WriteLine("Space for split items, comma between lvl,  / for typing");
                         input = Console.ReadLine().ToLower();
 
                         string[] inputUnlock = input.Split(' ');
@@ -190,189 +223,186 @@ namespace AlreathBuilder
 
                     case ("E"):
                     case ("EDIT"):
+                        bool editing = true;
+                        while (editing) {
+                            Console.WriteLine("____EDIT MODE____");
+                            Console.WriteLine("Input Name of Job to Edit");
+                            //Find which file to edit
+                            input = Console.ReadLine().ToLower();
 
-                        Console.WriteLine("Input Name of Job to Edit");
-                        //Find which file to edit
-                        input = Console.ReadLine().ToLower();
+                            //TODO
 
-                        //TODO
-
-                        var editList = Directory.GetFiles(filepath, "*.jb");
-                        foreach (var fileStr in editList)
-                        {
-                            //This way we can reference new and old files at the same time by string concat or file
-                            // editjob is the edited job which will be saved as file after done editing 
-                            // fileStr is path of old file
-
-
-                            if (filepath + "\\" + input + ".jb" == fileStr)
+                            var editList = Directory.GetFiles(filepath, "*.jb");
+                            foreach (var fileStr in editList)
                             {
-                                Console.WriteLine("Editing " + input);
+                                //This way we can reference new and old files at the same time by string concat or file
+                                // editjob is the edited job which will be saved as file after done editing 
+                                // fileStr is path of old file
 
-                                //Now to figure out what to edit by asking questions again, showing what the old val was
-                                // Edit ~ to use existing values
-                                // Maybe have a mode to append values like data so things can just be added and not replaced
-                                // ~+ to add or extend to existing, ~- to remove or subtract component
-                                //This way the things can be loaded in a tweaked without breaking older edits from scratch
-
-
-                                // file is the loaded job, the local saved file 
-
-                                using (var fileStream = File.Open(fileStr, FileMode.Open,FileAccess.ReadWrite))
+                                if (filepath + "\\" + input + ".jb" == fileStr)
                                 {
-                                    var binaryFormatter2 = new BinaryFormatter();
-                                    Job file = (Job)binaryFormatter2.Deserialize(fileStream);
+                                    Console.WriteLine("Editing " + input);
 
-                                    Console.WriteLine("StatBlock: ");
-                                    Dictionary<string, int> newStats = new Dictionary<string, int>();
-                                    //Loop thro the statblocks to display the existing data
-                                    foreach (var sta in file.statBlock) 
+                                    //Now to figure out what to edit by asking questions again, showing what the old val was
+                                    // Edit ~ to use existing values
+                                    // Maybe have a mode to append values like data so things can just be added and not replaced
+                                    // ~+ to add or extend to existing, ~- to remove or subtract component
+                                    //This way the things can be loaded in a tweaked without breaking older edits from scratch
+
+                                    // file is the loaded job, the local saved file 
+
+                                    using (var fileStream = File.Open(fileStr, FileMode.Open, FileAccess.ReadWrite))
                                     {
-                                        Console.WriteLine(sta);
-                                        Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
-                                        input = Console.ReadLine();
-                                        if (input[0] != '~' )
+                                        var binaryFormatter2 = new BinaryFormatter();
+                                        Job file = (Job)binaryFormatter2.Deserialize(fileStream);
+
+                                        Console.WriteLine("StatBlock: ");
+                                        Dictionary<string, int> newStats = new Dictionary<string, int>();
+                                        //Loop thro the statblocks to display the existing data
+                                        foreach (var sta in file.statBlock)
                                         {
-                                            //override vals
-                                            newStats[sta.Key] = int.Parse(input);
-                                        }
-                                        else
-                                        {
-                                            //merge new and old, action depends on input status
-                                            int change = 0;
-                                            if (input.Length > 1 )
+                                            Console.WriteLine(sta);
+                                            Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
+                                            input = Console.ReadLine();
+                                            if (input[0] != '~')
                                             {
+                                                //override vals
+                                                newStats[sta.Key] = int.Parse(input);
+                                            }
+                                            else
+                                            {
+                                                //merge new and old, action depends on input status
+                                                int change = 0;
+                                                if (input.Length > 1)
+                                                {
+                                                    if (input[1] == '+')
+                                                    {
+                                                        change = int.Parse(input.Substring(2).Trim());
+                                                        //Add to val
+                                                        newStats[sta.Key] = file.statBlock[sta.Key] + change;
+                                                    }
+                                                    if (input[1] == '-')
+                                                    {
+                                                        change = int.Parse(input.Substring(2).Trim());
+                                                        //Subtract from val
+                                                        newStats[sta.Key] = file.statBlock[sta.Key] - change;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    //keep old val, so just get old data
+                                                    newStats[sta.Key] = file.statBlock[sta.Key];
+                                                }
+                                            }
+                                            Console.WriteLine(newStats[sta.Key]);
+                                        }
+
+                                        Console.WriteLine("Requirements: ");
+                                        List<string> newReqs = new List<string>();
+                                        //Loop thro the statblocks to display the existing data
+                                        foreach (var req in file.requireList)
+                                        {
+                                            Console.WriteLine(req);
+                                            Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
+                                            input = Console.ReadLine();
+                                            if (input[0] != '~')
+                                            {
+                                                //override vals
+                                                //file.statBlock[sta.Key] = int.Parse(input);
+                                            }
+                                            else
+                                            {
+                                                //merge new and old, action depends on input status
+                                                int change = 0;
                                                 if (input[1] == '+')
                                                 {
-                                                    change = int.Parse(input.Substring(2).Trim());
+                                                    change = int.Parse(input.Substring(1));
                                                     //Add to val
-                                                    newStats[sta.Key] = file.statBlock[sta.Key] + change;
+                                                    //file.statBlock[sta.Key] = file.statBlock[sta.Key] + change;
                                                 }
                                                 if (input[1] == '-')
                                                 {
-                                                    change = int.Parse(input.Substring(2).Trim());
+                                                    change = int.Parse(input.Substring(1));
                                                     //Subtract from val
-                                                    newStats[sta.Key] = file.statBlock[sta.Key] - change;
+                                                    //file.statBlock[sta.Key] = file.statBlock[sta.Key] - change;
+                                                }
+                                                else
+                                                {
+                                                    //keep old val, so do nothing
                                                 }
                                             }
-                                            else
-                                            {
-                                                //keep old val, so just get old data
-                                                newStats[sta.Key] = file.statBlock[sta.Key];
-                                            }   
                                         }
-                                        Console.WriteLine(newStats[sta.Key]);
-                                    }
-                                    
-
-                                    Console.WriteLine("Requirements: ");
-                                    List<string> newReqs = new List<string>();
-                                    //Loop thro the statblocks to display the existing data
-                                    foreach (var req in file.requireList)
-                                    {
-                                        Console.WriteLine(req);
-                                        Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
-                                        input = Console.ReadLine();
-                                        if (input[0] != '~')
+                                        Console.WriteLine("Unlocks: ");
+                                        Dictionary<string, int> newUnlks = new Dictionary<string, int>();
+                                        //Loop thro the statblocks to display the existing data
+                                        foreach (var unl in file.unlockList)
                                         {
-                                            //override vals
-                                            //file.statBlock[sta.Key] = int.Parse(input);
-                                        }
-                                        else
-                                        {
-                                            //merge new and old, action depends on input status
-                                            int change = 0;
-                                            if (input[1] == '+')
+                                            Console.WriteLine(unl);
+                                            Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
+                                            input = Console.ReadLine();
+                                            if (input[0] != '~')
                                             {
-                                                change = int.Parse(input.Substring(1));
-                                                //Add to val
-                                                //file.statBlock[sta.Key] = file.statBlock[sta.Key] + change;
-                                            }
-                                            if (input[1] == '-')
-                                            {
-                                                change = int.Parse(input.Substring(1));
-                                                //Subtract from val
-                                                //file.statBlock[sta.Key] = file.statBlock[sta.Key] - change;
+                                                //override vals
+                                                //file.statBlock[sta.Key] = int.Parse(input);
                                             }
                                             else
                                             {
-                                                //keep old val, so do nothing
+                                                //merge new and old, action depends on input status
+                                                int change = 0;
+                                                if (input[1] == '+')
+                                                {
+                                                    change = int.Parse(input.Substring(1));
+                                                    //Add to val
+                                                    //file.statBlock[sta.Key] = file.statBlock[sta.Key] + change;
+                                                }
+                                                if (input[1] == '-')
+                                                {
+                                                    change = int.Parse(input.Substring(1));
+                                                    //Subtract from val
+                                                    //file.statBlock[sta.Key] = file.statBlock[sta.Key] - change;
+                                                }
+                                                else
+                                                {
+                                                    //keep old val, so do nothing
+                                                }
                                             }
                                         }
-                                    }
-                                    Console.WriteLine("Unlocks: ");
-                                    Dictionary<string, int> newUnlks = new Dictionary<string, int>();
-                                    //Loop thro the statblocks to display the existing data
-                                    foreach (var unl in file.unlockList)
-                                    {
-                                        Console.WriteLine(unl);
-                                        Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
-                                        input = Console.ReadLine();
-                                        if (input[0] != '~')
+
+                                        foreach (var stat in file.statBlock)
                                         {
-                                            //override vals
-                                            //file.statBlock[sta.Key] = int.Parse(input);
+                                            Console.Write(stat.Key);
+                                            Console.WriteLine(stat.Value);
                                         }
-                                        else
+
+                                        Console.WriteLine("Saving Edits");
+                                        //Write new data
+                                        file.statBlock = newStats;
+                                        file.requireList = newReqs;
+                                        file.unlockList = newUnlks;
+
+                                        foreach (var stat in file.statBlock)
                                         {
-                                            //merge new and old, action depends on input status
-                                            int change = 0;
-                                            if (input[1] == '+')
-                                            {
-                                                change = int.Parse(input.Substring(1));
-                                                //Add to val
-                                                //file.statBlock[sta.Key] = file.statBlock[sta.Key] + change;
-                                            }
-                                            if (input[1] == '-')
-                                            {
-                                                change = int.Parse(input.Substring(1));
-                                                //Subtract from val
-                                                //file.statBlock[sta.Key] = file.statBlock[sta.Key] - change;
-                                            }
-                                            else
-                                            {
-                                                //keep old val, so do nothing
-                                            }
-
-
+                                            Console.Write(stat.Key);
+                                            Console.WriteLine(stat.Value);
                                         }
+
+                                        binaryFormatter2.Serialize(fileStream, file);
+
+                                        //Close stream, no further edits needed
+                                        fileStream.Close();
                                     }
-
-
-
-                                    foreach (var stat in file.statBlock) {
-                                        Console.Write(stat.Key);
-                                        Console.WriteLine(stat.Value);
-                                    }
-
-
-                                    Console.WriteLine("Saving Edits");
-                                    //Write new data
-                                    file.statBlock = newStats;
-                                    file.requireList = newReqs;
-                                    file.unlockList = newUnlks;
-
-                                    foreach (var stat in file.statBlock)
-                                    {
-                                        Console.Write(stat.Key);
-                                        Console.WriteLine(stat.Value);
-                                    }
-
-
-                                    binaryFormatter2.Serialize(fileStream,file);
-
-
-                                    //Close stream, no further edits needed
-                                    fileStream.Close();
+                                    break;
                                 }
-                                break;
+                            }
+                            //Didnt find file in dir or finished
+                            //Console.WriteLine("File not found in Cur Dir");
+                            //ENDTODO
+
+                            Console.WriteLine("Finished editing? [Y/N]");
+                            if (Console.ReadLine() == "y") {
+                                editing = false;
                             }
                         }
-                        //Didnt find file in dir or finished
-                        //Console.WriteLine("File not found in Cur Dir");
-                        //ENDTODO
-
-
                         break;
                     case ("L"):
                     case ("LIST"):
@@ -385,7 +415,7 @@ namespace AlreathBuilder
                         break;
                     case ("DEL"):
                     case ("DELETE"):
-                        //
+                        // Deletes the file
                         Console.WriteLine("Input Name of Item to Delete");
                         input = Console.ReadLine().ToLower();
                         //Checks in DIR\Items for the inputed name
@@ -520,9 +550,7 @@ namespace AlreathBuilder
                 }
             }
         }
-        
-
-    private static void MonsterBuilder(string filepath)
+        private static void MonsterBuilder(string filepath)
     {
         //Monster Builder
         //  --Monster type, class
@@ -603,7 +631,230 @@ namespace AlreathBuilder
                     break;
             }
         } }
+        private static void QuestBuilder(string filepath, string command = "")
+        {
+            //Quest Builder
+            //  --Quest Type 
+            //      -Hidden, limited, Repeatable
+            //  --Quest Stages
+            //      -Loop til finished
+            //      -Stage Objectives
+            //      -Stage Desc
+            //      -Stage Rewards
+            //      -Next Stage
+            //
+            //  --Quest Rewards
+            bool loop = true;
+            while (loop)
+            {
 
+                Console.WriteLine("----Quest Builder----");
+                Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
+                string input = Console.ReadLine();
+                switch (input.ToUpper())
+                {
+                    case ("N"):
+                    case ("NEW"):
+                        //New Quest
+                        Console.WriteLine("Input Name of Quest to Create");
+                        input = Console.ReadLine();
+
+                        Quest qst = new Quest();
+                        qst.QID = input;
+
+                        string filePath = filepath + "\\" + input + ".qst";
+
+                        //Need to check if input already exists, 
+                        var binaryFormatter = new BinaryFormatter();
+                        using (var fileStream = File.Create(filePath))
+                            binaryFormatter.Serialize(fileStream, qst);
+
+
+                        //Time to set up all the info and write the data again
+                        Console.WriteLine("Quest Desc");
+                        qst.desc = Console.ReadLine();
+                        Console.WriteLine("Quest Hidden?");
+                        switch (Console.ReadLine().ToLower())
+                        {
+                            case("true"):
+                            case ("y"):
+                                qst.hidden = true;
+                                break;
+                            default:
+                                qst.hidden = false;
+                                break;
+                                
+                        }
+                        Console.WriteLine("Limited Time? (-1 to n)");
+
+                        int val;
+                        val = int.Parse(Console.ReadLine());
+                        qst.limit = val;
+
+                        Console.WriteLine("Repeatable? (-1 to n)");
+
+                        
+                        val = int.Parse(Console.ReadLine());
+                        qst.limit = val;
+
+                        Console.WriteLine("Quest Special?");
+                        switch (Console.ReadLine().ToLower())
+                        {
+                            case ("true"):
+                            case ("y"):
+                                qst.spec = true;
+                                break;
+                            default:
+                                qst.spec = false;
+                                break;
+
+                        }
+
+                        bool staging = true;
+                        while (staging) 
+                        {
+                            //List of objectives
+                            //Reward for stage complete
+                            Console.WriteLine("____Staging___");
+
+
+
+
+
+
+                            Console.WriteLine("Continue Staging");
+                            switch (Console.ReadLine().ToLower())
+                            {
+                                case ("yes"):
+                                case ("y"):
+                                    break;
+                                default:
+                                    staging = false;
+                                    break;
+
+                            }
+
+                        }
+
+
+                        break;
+                    case ("E"):
+                    case ("EDIT"):
+                        bool editing = true;
+                        while (editing)
+                        {
+                            Console.WriteLine("____EDIT MODE____");
+                            Console.WriteLine("Input Name of Quest to Edit");
+                            //Find which file to edit
+                            input = Console.ReadLine().ToLower();
+
+                            //TODO
+
+                            var editList = Directory.GetFiles(filepath, "*.qst");
+                            foreach (var fileStr in editList)
+                            {
+                                //This way we can reference new and old files at the same time by string concat or file
+                                // editjob is the edited job which will be saved as file after done editing 
+                                // fileStr is path of old file
+
+                                if (filepath + "\\" + input + ".qst" == fileStr)
+                                {
+                                    Console.WriteLine("Editing " + input);
+
+                                    //Now to figure out what to edit by asking questions again, showing what the old val was
+                                    // Edit ~ to use existing values
+                                    // Maybe have a mode to append values like data so things can just be added and not replaced
+                                    // ~+ to add or extend to existing, ~- to remove or subtract component
+                                    //This way the things can be loaded in a tweaked without breaking older edits from scratch
+
+                                    // file is the loaded job, the local saved file 
+
+                                    using (var fileStream = File.Open(fileStr, FileMode.Open, FileAccess.ReadWrite))
+                                    {
+                                        var binaryFormatter2 = new BinaryFormatter();
+                                        Quest file = (Quest)binaryFormatter2.Deserialize(fileStream);
+
+
+                                        //TODO
+
+
+                                        Console.WriteLine("StatBlock: ");
+                                        Dictionary<string, int> newStats = new Dictionary<string, int>();
+                                        //Loop thro the queststages to display the existing data
+                                        foreach (var sta in file.StageList)
+                                        {
+                                            Console.WriteLine(sta);
+                                            Console.WriteLine("~ to keep, ~- to remove, ~+ to add to it, any val to replace");
+                                            input = Console.ReadLine();
+                                            if (input[0] != '~')
+                                            {
+                                                //override vals
+                                                
+                                            }
+                                            
+                                        }
+
+                                        
+                                        
+
+                                        
+
+                                        Console.WriteLine("Saving Edits");
+                                        //Write new data
+                                        
+
+                                        binaryFormatter2.Serialize(fileStream, file);
+
+                                        //Close stream, no further edits needed
+                                        fileStream.Close();
+                                    }
+                                    break;
+                                }
+                            }
+                            //Didnt find file in dir or finished
+                            //Console.WriteLine("File not found in Cur Dir");
+                            //ENDTODO
+
+                            Console.WriteLine("Finished editing? [Y/N]");
+                            if (Console.ReadLine() == "y")
+                            {
+                                editing = false;
+                            }
+                        }
+                        break;
+                    case ("L"):
+                    case ("LIST"):
+                        //Will Get list of all Items in DIR\Jobs
+                        var listFiles = Directory.GetFiles(filepath, "*.qst");
+                        foreach (var file in listFiles)
+                        {
+                            Console.WriteLine(file);
+                        }
+                        break;
+                    case ("DEL"):
+                        //
+                        Console.WriteLine("Input Name of Quest to Delete");
+                        input = Console.ReadLine();
+                        //Checks in DIR\Items for the inputed name
+                        var delList = Directory.GetFiles(filepath, "*.qst");
+                        foreach (var file in delList)
+                        {
+                            if (input == file)
+                            {
+                                //DEL ITEM
+                                File.Delete(filepath + "\\" + file);
+                            }
+                        }
+                        break;
+                    case ("Q"):
+                        loop = false;
+                        break;
+                    default:
+                        Console.WriteLine("Incorrect Input");
+                        break;
+                }
+            }
+        }
 
 
         static void Main(string[] args)
@@ -611,7 +862,15 @@ namespace AlreathBuilder
             //Select filepath for storage
 
             Console.WriteLine("Server Storage Dir: ");
-            string curDir = Console.ReadLine();
+            string path = Console.ReadLine();
+
+            if (path.Trim() == "") {
+                //blank path
+                // use curDir
+                path = Directory.GetCurrentDirectory();
+            }
+
+            string curDir = path;
 
             //Enter just sticks it in C drive for now, not where exe is.
 
@@ -624,7 +883,7 @@ namespace AlreathBuilder
                 //Will eventually allow for commandline with alreathbuilder.exe J N 
                 // to jump to sub processes
                 //
-                Console.WriteLine("Choose JobBuilder (J), ItemBuilder (I), MonsterBuilder (M)");
+                Console.WriteLine("Choose JobBuilder (J), ItemBuilder (I), MonsterBuilder (M), QuestBuilder (Q)");
                 Console.WriteLine("Change Dir (CD), Exit (E)");
 
                 switch (Console.ReadLine().ToUpper())
@@ -641,6 +900,10 @@ namespace AlreathBuilder
                     case "M":
                         Directory.CreateDirectory(curDir + "\\Monsters");
                         MonsterBuilder(curDir + "\\Monsters");
+                        break;
+                    case "Q":
+                        Directory.CreateDirectory(curDir + "\\Quests");
+                        QuestBuilder(curDir + "\\Quests");
                         break;
                     case "CD":
                         Console.WriteLine("Cur Dir: " + curDir);
