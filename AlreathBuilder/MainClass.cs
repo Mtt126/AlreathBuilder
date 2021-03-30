@@ -330,7 +330,7 @@ namespace AlreathBuilder
 
 
 
-                        string filePath = filepath + "\\" + job.name + ".jb";
+                        string filePath = filepath + "\\" + job.name + ".job";
                         //Create file and write data
                         var binaryFormatter = new BinaryFormatter();
                         using (var fileStream = File.Open(filePath, FileMode.OpenOrCreate))
@@ -352,14 +352,14 @@ namespace AlreathBuilder
 
                             //TODO
 
-                            var editList = Directory.GetFiles(filepath, "*.jb");
+                            var editList = Directory.GetFiles(filepath, "*.job");
                             foreach (var fileStr in editList)
                             {
                                 //This way we can reference new and old files at the same time by string concat or file
                                 // editjob is the edited job which will be saved as file after done editing 
                                 // fileStr is path of old file
 
-                                if (filepath + "\\" + input + ".jb" == fileStr)
+                                if (filepath + "\\" + input + ".job" == fileStr)
                                 {
                                     Console.WriteLine("Editing " + input);
 
@@ -528,7 +528,7 @@ namespace AlreathBuilder
                     case ("L"):
                     case ("LIST"):
                         //Will Get list of all Items in DIR\Jobs
-                        var listFiles = Directory.GetFiles(filepath, "*.jb");
+                        var listFiles = Directory.GetFiles(filepath, "*.job");
                         foreach (var file in listFiles)
                         {
                             Console.WriteLine(file);
@@ -540,7 +540,7 @@ namespace AlreathBuilder
                         Console.WriteLine("Input Name of Item to Delete");
                         input = Console.ReadLine().ToLower();
                         //Checks in DIR\Items for the inputed name
-                        var delList = Directory.GetFiles(filepath, "*.jb");
+                        var delList = Directory.GetFiles(filepath, "*.job");
                         foreach (var file in delList)
                         {
                             //Console.WriteLine(file);
@@ -594,7 +594,6 @@ namespace AlreathBuilder
 
                         Item item = new Item();
 
-
                         string itemName = input;
                         item.name = itemName;
                         Console.WriteLine("Item Desc:");
@@ -624,13 +623,41 @@ namespace AlreathBuilder
                         break;
                     case ("E"):
                     case ("EDIT"):
+                        bool editing = true;
+                        while (editing) {
 
-                        Console.WriteLine("Input Name of Item to Edit");
-                        //
-                        input = Console.ReadLine();
-                        //TODO
+                            Console.WriteLine("Input Name of Item to Edit");
+                            //
+                            input = Console.ReadLine();
+                            //TODO
 
+                            //Find item to edit
 
+                            //Get what detail to edit
+                            Console.WriteLine("Name,desc,worth,script ?");
+                            switch (Console.ReadLine().ToLower()) {
+                                case ("name"):
+
+                                    break;
+                                case ("desc"):
+
+                                    break;
+                                case ("worth"):
+                                    break;
+                                case ("script"):
+                                    break;
+                                case ("data"):
+                                    break;
+                                default:
+                                    break;
+
+                            }
+                            Console.WriteLine("Done Editing? (Y/N)");
+                            input = Console.ReadLine();
+                            if (input == "Y") {
+                                editing = false;
+                            }
+                        }
                         break;
                     case ("L"):
                     case ("LIST"):
