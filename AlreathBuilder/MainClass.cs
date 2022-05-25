@@ -108,12 +108,16 @@ namespace AlreathBuilder
             public List<LocPoint> PatrolPoints;         // List of PatrolPoints
             public bool Roamer;                         // Allow for AI to change locations
             //public List<string> Nearby;                 // Will become a list of nearby gameobjects to help store data, starts blank anyways and will gain data at runtime
-            public int DetectRange;                     // Int to determine range of nearby objects
+            public int DetectRange;                     // Int to determine range of nearby objects, "Hearing Range", objects are interacted within this range, or globally affected using direct data transfer
+            public int DisengageRange;                  // NPC forgets interactions with objects outside DetectRange, Disengage < DetectRange, quit trades, reset aggro etc.
+
             public LocPoint HomeLoc;                      // Starting area to return to 
             public LocPoint CurLoc;                       // Might not need until runtime, but current location
 
             public List<string> LootTables;           //List of Loot Tables, name of lootTables to store loot tables separate to reuse ex. goblins loot
 
+            public List<string> TownScripts;            // List of additional town scripts ex: Trainer, Stables, Merchant, Quest.  Adds additional components on object at runtime.
+                                                        // These components should be given a .AI file that contains trade tables or Quest List etc.   Merchant:BOB_MERC.AI, Trainer:BOB_TRAIN.AI
 
         }
 
