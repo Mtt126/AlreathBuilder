@@ -1,0 +1,25 @@
+﻿<Window x:Class="AlreathBuilderGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AlreathBuilderGUI"
+        mc:Ignorable="d"
+        Title="Alreath Builder" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="41*"/>
+            <ColumnDefinition Width="751*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="1" HorizontalAlignment="Left" Height="164" Margin="0,90,0,0" VerticalAlignment="Top" Width="74">
+            <Button Content="Jobs" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="JobsBut"/>
+            <Button Content="Monsters" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="MonsterBut"/>
+            <Button Content="Equipment" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="ItemBut"/>
+            <Button Content="Quests" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="QuestBut"/>
+            <Button Content="Feats" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="QuestBut"/>
+
+            <Button Content="Quit" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Click="QuitBut"/>
+        </StackPanel>
+
+    </Grid>
+</Window>
