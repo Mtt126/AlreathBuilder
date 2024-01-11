@@ -33,7 +33,7 @@ namespace AlreathBuilderGUI
             // switch to a private and methods to set values?  
             // or leave public to allow tweaks
             public string name;
-            private string desc;
+            public string desc;
 
             private int exp;
             private int lvl;
@@ -72,13 +72,15 @@ namespace AlreathBuilderGUI
             // lvl 1, Fireball
             // lvl 5 Firebolt
             // lvl 100 = Mastery, Title of Mastery of Mage, Unlocks Wizard Job, etc.
+
+
         }
 
         public struct Monster { }
 
 
         //Vars
-        string curDir;
+        private string curDir;
 
 
         public MainWindow()
@@ -87,126 +89,54 @@ namespace AlreathBuilderGUI
 
             //Setup vars
             curDir = Directory.GetCurrentDirectory();
+            InitDirectory();
 
         }
+
+        private void InitDirectory() 
+        {
+            //Setup folders if not exist
+            Directory.CreateDirectory(curDir + "\\Jobs");
+            Directory.CreateDirectory(curDir + "\\Monsters");
+            Directory.CreateDirectory(curDir + "\\Items");
+            Directory.CreateDirectory(curDir + "\\Quests");
+            Directory.CreateDirectory(curDir + "\\Feats");
+        }
+
 
         private void JobsBut(object sender, RoutedEventArgs e)
         {
-            Directory.CreateDirectory(curDir + "\\Jobs");
-            JobBuilder(curDir + "\\Jobs");
+            JobBuilder();
         }
         private void MonsterBut(object sender, RoutedEventArgs e)
         {
-            Directory.CreateDirectory(curDir + "\\Monsters");
-            MonsterBuilder(curDir + "\\Monsters");
+            
+            MonsterBuilder();
         }
         private void ItemBut(object sender, RoutedEventArgs e)
         {
-            Directory.CreateDirectory(curDir + "\\Items");
-            ItemBuilder(curDir + "\\Items");
+            ItemBuilder();
         }
-
         private void QuestBut(object sender, RoutedEventArgs e)
         {
-            Directory.CreateDirectory(curDir + "\\Quests");
-            QuestBuilder(curDir + "\\Quests");
+            
+            QuestBuilder();
         }
         private void FeatBut(object sender, RoutedEventArgs e)
         {
-            Directory.CreateDirectory(curDir + "\\Feats");
-            FeatBuilder(curDir + "\\Feats");
+            
+            FeatBuilder();
         }
 
-        //Save and Load don't happen here, Save on window closure, load happens on all in directory on BuilderMethods
-
-
-
-        private static void JobBuilder(string filepath, string command = "")
+        private static void JobBuilder()
         {
-            //JobBuilder
-            //  --Stat Block
-            //  --Lvl Unlocks
-            //      --Skills
-            //      --Titles (which trigger mastery)
-            //      --Job Unlock
-            bool loop = true;
-            while (loop)
-            {
-                //Console.WriteLine("----Job Builder----");
-                //Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
-                //string input = Console.ReadLine();
-                string input = "";
-                switch (input.ToUpper())
-                {
-                    case ("N"):
-                    case ("NEW"):
-                        //New item 
-                        Console.WriteLine("Input Name of Job to Create (converts to lower)");
-                        input = Console.ReadLine().ToLower();
 
-                        Job job = new Job();
+            JobWindow jobWindow = new JobWindow();
 
-                        string jobName = input;
-                        //Set values for job
-                        job.name = input;
+            jobWindow.ShowDialog();
 
-
-                        string filePath = filepath + "\\" + jobName + ".jb";
-                        //Create Item
-                        var binaryFormatter = new BinaryFormatter();
-                        using (var fileStream = File.Create(filePath))
-                            binaryFormatter.Serialize(fileStream, job);
-
-                        break;
-                    case ("E"):
-                    case ("EDIT"):
-
-                        Console.WriteLine("Input Name of Job to Edit");
-                        //
-                        input = Console.ReadLine().ToLower();
-
-                        //TODO
-
-                        break;
-                    case ("L"):
-                    case ("LIST"):
-                        //Will Get list of all Items in DIR\Jobs
-                        var listFiles = Directory.GetFiles(filepath, "*.jb");
-                        foreach (var file in listFiles)
-                        {
-                            Console.WriteLine(file);
-                        }
-                        break;
-                    case ("DEL"):
-                    case ("DELETE"):
-                        //
-                        Console.WriteLine("Input Name of Item to Delete");
-                        input = Console.ReadLine().ToLower();
-                        //Checks in DIR\Items for the inputed name
-                        var delList = Directory.GetFiles(filepath, "*.jb");
-                        foreach (var file in delList)
-                        {
-                            Console.WriteLine(file);
-                            if (filepath + "\\" + input + ".jb" == file)
-                            {
-                                //DEL ITEM
-                                Console.WriteLine("Deleted " + input);
-                                File.Delete(file);
-                                break;
-                            }
-                        }
-                        break;
-                    case ("Q"):
-                    case ("QUIT"):
-                        loop = false;
-                        break;
-                    default:
-                        Console.WriteLine("Incorrect Input");
-                        break;
-                }
-            }
         }
-        private static void ItemBuilder(string filepath)
+        private static void ItemBuilder()
         {
             //ItemBuilder
             //  --Basic Item Data
@@ -222,6 +152,7 @@ namespace AlreathBuilderGUI
                 Console.WriteLine("----Item Builder----");
                 Console.WriteLine("Choose New (N), Edit (E), List (L), Delete (DEL), Quit (Q)");
                 string input = Console.ReadLine();
+                string filepath = "";
                 switch (input.ToUpper())
                 {
                     case ("N"):
@@ -292,18 +223,12 @@ namespace AlreathBuilderGUI
                             }
                         }
                         break;
-                    case ("Q"):
-                    case ("QUIT"):
-                        loop = false;
-                        break;
-                    default:
-                        Console.WriteLine("Incorrect Input");
-                        break;
+                    
                 }
             }
         }
 
-        private static void MonsterBuilder(string filepath)
+        private static void MonsterBuilder()
         {
             //Monster Builder
             //  --Monster type, class
@@ -317,6 +242,77 @@ namespace AlreathBuilderGUI
                 Console.WriteLine("----Monster Builder----");
                 Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
                 string input = Console.ReadLine();
+                string filepath = "";
+                switch (input.ToUpper())
+                {
+                    case ("N"):
+                        //New item 
+                        Console.WriteLine("Input Name of Monster to Create");
+                        input = Console.ReadLine();
+
+                        //Item item = new Item();
+                        Hashtable item = new Hashtable();
+
+                        string itemName = input;
+                        item["Name"] = itemName;
+
+                        string filePath = filepath + "\\" + itemName + ".mob";
+                        //Create Item
+                        var binaryFormatter = new BinaryFormatter();
+                        using (var fileStream = File.Create(filePath))
+                            binaryFormatter.Serialize(fileStream, item);
+
+
+                        break;
+                    case ("E"):
+                    case ("EDIT"):
+                        Console.WriteLine("Input Name of Monster to Edit");
+                        //
+                        input = Console.ReadLine();
+                        //TODO
+                        break;
+                    case ("L"):
+                    case ("LIST"):
+                        //Will Get list of all Items in DIR\Jobs
+                        var listFiles = Directory.GetFiles(filepath, "*.mob");
+                        foreach (var file in listFiles)
+                        {
+                            Console.WriteLine(file);
+                        }
+                        break;
+                    case ("DEL"):
+                        //
+                        Console.WriteLine("Input Name of Monster to Delete");
+                        input = Console.ReadLine();
+                        //Checks in DIR\Items for the inputed name
+                        var delList = Directory.GetFiles(filepath, "*.mob");
+                        foreach (var file in delList)
+                        {
+                            if (input == file)
+                            {
+                                //DEL ITEM
+                                File.Delete(filepath + "\\" + file);
+                            }
+                        }
+                        break;
+
+                }
+            }
+        }
+
+        private static void QuestBuilder()
+        {
+            //Quest Builder
+            //  --Quest type
+            //  --Quest Loot Table
+            bool loop = true;
+            while (loop)
+            {
+
+                Console.WriteLine("----Monster Builder----");
+                Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
+                string input = Console.ReadLine();
+                string filepath = "";
                 switch (input.ToUpper())
                 {
                     case ("N"):
@@ -379,7 +375,7 @@ namespace AlreathBuilderGUI
             }
         }
 
-        private static void QuestBuilder(string filepath)
+        private static void FeatBuilder()
         {
             //Monster Builder
             //  --Monster type, class
@@ -393,82 +389,7 @@ namespace AlreathBuilderGUI
                 Console.WriteLine("----Monster Builder----");
                 Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
                 string input = Console.ReadLine();
-                switch (input.ToUpper())
-                {
-                    case ("N"):
-                        //New item 
-                        Console.WriteLine("Input Name of Monster to Create");
-                        input = Console.ReadLine();
-
-                        //Item item = new Item();
-                        Hashtable item = new Hashtable();
-
-                        string itemName = input;
-                        item["Name"] = itemName;
-
-                        string filePath = filepath + "\\" + itemName + ".mob";
-                        //Create Item
-                        var binaryFormatter = new BinaryFormatter();
-                        using (var fileStream = File.Create(filePath))
-                            binaryFormatter.Serialize(fileStream, item);
-
-
-                        break;
-                    case ("E"):
-                    case ("EDIT"):
-                        Console.WriteLine("Input Name of Monster to Edit");
-                        //
-                        input = Console.ReadLine();
-                        //TODO
-                        break;
-                    case ("L"):
-                    case ("LIST"):
-                        //Will Get list of all Items in DIR\Jobs
-                        var listFiles = Directory.GetFiles(filepath, "*.mob");
-                        foreach (var file in listFiles)
-                        {
-                            Console.WriteLine(file);
-                        }
-                        break;
-                    case ("DEL"):
-                        //
-                        Console.WriteLine("Input Name of Monster to Delete");
-                        input = Console.ReadLine();
-                        //Checks in DIR\Items for the inputed name
-                        var delList = Directory.GetFiles(filepath, "*.mob");
-                        foreach (var file in delList)
-                        {
-                            if (input == file)
-                            {
-                                //DEL ITEM
-                                File.Delete(filepath + "\\" + file);
-                            }
-                        }
-                        break;
-                    case ("Q"):
-                        loop = false;
-                        break;
-                    default:
-                        Console.WriteLine("Incorrect Input");
-                        break;
-                }
-            }
-        }
-
-        private static void FeatBuilder(string filepath)
-        {
-            //Monster Builder
-            //  --Monster type, class
-            //  --Monster Stats
-            //  --Monster abilities
-            //  --Monster Loot Table
-            bool loop = true;
-            while (loop)
-            {
-
-                Console.WriteLine("----Monster Builder----");
-                Console.WriteLine("Choose New Item (N), Edit (E), List (L), Delete Old (DEL), Quit (Q)");
-                string input = Console.ReadLine();
+                string filepath = "";
                 switch (input.ToUpper())
                 {
                     case ("N"):
@@ -534,53 +455,8 @@ namespace AlreathBuilderGUI
 
         private void QuitBut(object sender, RoutedEventArgs e)
         {
-
+            //Might add some saves or close out memory before exiting, but for now it should be fine to close
+            Environment.Exit(0);
         }
-    }
-}
-
-
-
-namespace AlreathBuilder
-{
-
-    class AlreathBuilder
-    {
-
-        static void Main(string[] args)
-        {
-            //Select filepath for storage
-
-            Console.WriteLine("Server Storage Dir: ");
-            string curDir = Console.ReadLine();
-
-            //Start loop
-            bool loop = true;
-            while (loop)
-            {
-                //print out choices to build
-                //
-                //Will eventually allow for commandline with alreathbuilder.exe J N 
-                // to jump to sub processes
-                //
-                Console.WriteLine("Choose JobBuilder (J), ItemBuilder (I), MonsterBuilder (M)");
-                Console.WriteLine("Change Dir (CD), Exit (E)");
-
-                switch (Console.ReadLine().ToUpper())
-                {
-                    case "CD":
-                        Console.WriteLine("New Storage Dir:");
-                        curDir = Console.ReadLine();
-                        break;
-                    case "E":
-                        loop = false;
-                        break;
-                    default:
-                        Console.WriteLine("Incorrect Input");
-                        break;
-                }
-            }
-        }
-
     }
 }

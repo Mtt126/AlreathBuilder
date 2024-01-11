@@ -1,0 +1,24 @@
+﻿<Window x:Class="AlreathBuilderGUI.JobWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AlreathBuilderGUI"
+        mc:Ignorable="d"
+        Title="Job Builder" Height="450" Width="800">
+    <Grid>
+        <Button Content="Quit" HorizontalAlignment="Left" Margin="10,368,0,0" VerticalAlignment="Top" Click="JobFinishedBut"/>
+        <ComboBox Name="SelectedBox" HorizontalAlignment="Left" Margin="75,13,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="SelectedBox_SelectionChanged" Text=""/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,16,0,0" TextWrapping="Wrap" Text="Editing:" VerticalAlignment="Top"/>
+        <Button Content="Save" HorizontalAlignment="Left" Margin="10,343,0,0" VerticalAlignment="Top" Click="SaveJobBut"/>
+        <StackPanel Margin="195,24,10,46">
+            <TextBox Name="JobName" TextWrapping="Wrap" Text="JobName" Width="120" TextChanged="JobName_TextChanged"/>
+            <TextBox Name="JobDesc" TextWrapping="Wrap" Text="Insert Job Desc" Width="120" TextChanged="JobDesc_TextChanged"/>
+            <local:StatBlock x:Name="JobStatBlock" Width="127" Height="226"/>
+
+
+        </StackPanel>
+        
+
+    </Grid>
+</Window>
